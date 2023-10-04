@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Consumo de Energia</title>
+</head>
+<body>
+    <h1>Simulador de Consumo de Energia</h1>
+    <p>Energia consumida: <span id="energiaConsumida">0</span> watts</p>
+    <p>Valor a pagar por hora: R$ <span id="valorMinuto">0</span></p>
+    <p>Tempo decorrido: <span id="tempoDecorrido">0</span> minutos</p>
+    <button id="atualizar">Atualizar</button>
+
+    <script>
+        const energiaConsumidaElement = document.getElementById('energiaConsumida');
+        const tempoDecorridoElement = document.getElementById('tempoDecorrido');
+        const valorMinutoElement = document.getElementById('valorMinuto');
+        const atualizarButton = document.getElementById('atualizar');
+
+        atualizarButton.addEventListener('click', () => {
+            fetch('http://127.0.0.1:5000/consumo', { method: 'POST', body: JSON.stringify({ consumo: 0 }) })
+                .then(response => response.json())
+                .then(data => {
+                    energiaConsumidaElement.textContent = data.energia_consumida;
+                    tempoDecorridoElement.textContent = data.tempo_decorrido;
+                });
+        });
+
+        // Atualizar automaticamente a cada minuto
+        setInterval(() => {
+            fetch('http://127.0.0.1:5000/consumo')
+                .then(response => response.json())
+                .then(data => {
+                    energiaConsumidaElement.textContent = data.energia_consumida;
+                    tempoDecorridoElement.textContent = data.tempo_decorrido;
+                    let valor = data.energia_consumida * 0.5;
+                    valorMinutoElement.textContent = valor.toFixed(2);
+                });
+        }, 60000);  // 60000ms = 1 minuto
+    </script>
+</body>
+</html>
